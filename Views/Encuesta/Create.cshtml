@@ -1,0 +1,47 @@
+@{
+    ViewData["Title"] = "Encuesta de Satisfacción";
+}
+
+<h2>Encuesta de Satisfacción</h2>
+
+<form asp-action="Gracias">
+    <div>
+        <label>1. ¿Qué tan satisfecho estás?</label>
+        <select>
+            <option>Muy satisfecho</option>
+            <option>Satisfecho</option>
+            <option>Neutral</option>
+            <option>Insatisfecho</option>
+            <option>Muy insatisfecho</option>
+        </select>
+    </div>
+
+    <div>
+        <label>2. ¿El tiempo de respuesta fue adecuado?</label>
+        <select>
+            <option>Sí</option>
+            <option>No</option>
+        </select>
+    </div>
+
+    <div>
+        <label>3. ¿La solución resolvió tu problema?</label>
+        <select>
+            <option>Sí, completamente</option>
+            <option>Parcialmente</option>
+            <option>No</option>
+        </select>
+    </div>
+
+    <div>
+        <label>4. Amabilidad del personal (1-5):</label>
+        <input type="number" min="1" max="5" />
+    </div>
+
+    <div>
+        <label>5. Comentarios:</label>
+        <textarea></textarea>
+    </div>
+
+    <button type="submit">Enviar</button>
+</form>
