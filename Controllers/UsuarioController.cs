@@ -3,6 +3,7 @@ using Gestper.Models;
 using Gestper.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Threading.Tasks;
+using System.Linq;
 
 namespace Gestper.Controllers
 {
@@ -34,10 +35,10 @@ namespace Gestper.Controllers
                 _context.Usuarios.Add(usuario);
                 await _context.SaveChangesAsync();
 
-                return RedirectToAction("Index", "Home"); // Redirige a la página principal después de registrarse
+                return RedirectToAction("Index", "Home");
             }
 
-            return View("Views/registro/registro.layout.cshtml"); // Si hay errores, se vuelve a mostrar el formulario
+            return View("Views/registro/registro.layout.cshtml");
         }
 
         // GET: Usuario/Login
@@ -53,44 +54,62 @@ namespace Gestper.Controllers
         {
             if (ModelState.IsValid)
             {
-                // Buscar al usuario en la base de datos por correo
                 var usuario = await _context.Usuarios
                     .FirstOrDefaultAsync(u => u.Correo == model.Correo);
 
-                // Si el usuario existe
-                if (ModelState.IsValid)
+                if (usuario != null)
                 {
-                    // Verificar la contraseña (deberías encriptar las contraseñas en un entorno real)
                     if (usuario.Contrasena == model.Contrasena)
                     {
-                        // Guardar información del usuario en la sesión
                         HttpContext.Session.SetString("UsuarioCorreo", usuario.Correo);
                         HttpContext.Session.SetString("UsuarioId", usuario.IdUsuario.ToString());
 
-                        // Redirigir al perfil del usuario
                         return RedirectToAction("Index", "CRUD");
                     }
                     else
                     {
-                        // Si la contraseña no es correcta
                         ModelState.AddModelError(string.Empty, "Contraseña incorrecta.");
                     }
                 }
                 else
                 {
-                    // Si no se encuentra al usuario
                     ModelState.AddModelError(string.Empty, "Usuario no encontrado.");
                 }
             }
 
-            // Si algo falla, volvemos a mostrar el formulario de login con el error
             return View("Views/login/login.layout.cshtml", model);
         }
+
         [HttpPost]
         public IActionResult CerrarSesion()
         {
             HttpContext.Session.Clear();
             return RedirectToAction("Login", "Usuario");
         }
+
+        // ✅ NUEVA ACCIÓN: Ver Tickets Asignados al Usuario
+        public async Task<IActionResult> VerTickets(int id)
+        {
+            var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.IdUsuario == id);
+
+            if (usuario == null)
+            {
+                return NotFound();
+            }
+
+            usuario.TicketsAsignados = await _context.Tickets
+                .Where(t => t.IdSoporteAsignado == id)
+                .ToListAsync();
+
+            return View("Views/Usuario/VerTickets.cshtml", usuario);
+        }
+
+        // ✅ NUEVA ACCIÓN: Mostrar lista de usuarios (trabajadores)
+        public async Task<IActionResult> Index()
+        {
+            var usuarios = await _context.Usuarios.ToListAsync();
+            return View("Views/Usuario/Index.cshtml", usuarios);
+        }
     }
 }
+

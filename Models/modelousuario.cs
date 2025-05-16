@@ -21,4 +21,7 @@ public class Usuario
 
     public bool Activo { get; set; }
     
+    public ICollection<Ticket> TicketsAsignados { get; set; } = new List<Ticket>();
+
+    
 }
